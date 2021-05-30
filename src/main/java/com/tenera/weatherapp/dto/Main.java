@@ -32,9 +32,4 @@ public class Main {
 		this.pressure = pressure;
 	}
 
-	@Override
-	public String toString() {
-		return "Main [temp=" + temp + ", pressure=" + pressure + "]";
-	}
-
 }

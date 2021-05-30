@@ -74,9 +74,4 @@ public class WeatherData {
 		this.umbrella = umbrella;
 	}
 
-	@Override
-	public String toString() {
-		return "WeatherData [id=" + id + ", location=" + location + ", temp=" + temp + ", pressure=" + pressure
-				+ ", umbrella=" + umbrella + "]";
-	}
 }

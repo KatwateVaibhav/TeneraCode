@@ -34,21 +34,23 @@ class WeatherControllerTest {
 	
     @LocalServerPort
     private  int port;
-    private  String currentWeatherurl;
-    private  String historyWeatherurl;
+    private  String currentWeatherUrl;
+    private  String historyWeatherUrl;
+    private String locationWithCountryUrl;
     
     
     
     @BeforeEach
     public void setUp() {
-    	currentWeatherurl = "http://localhost:" + port + "/current?location=Berlin";
-        historyWeatherurl = "http://localhost:" + port + "/history?location=Berlin";
+    	currentWeatherUrl = "http://localhost:" + port + "/current?location=Paris";
+        historyWeatherUrl = "http://localhost:" + port + "/history?location=Berlin";
+        locationWithCountryUrl = "http://localhost:" + port + "/current?location=London,uk";
         
     }
     @Test
    	void wrongApiKey() {
     	ReflectionTestUtils.setField(weatherService, "apiKey", "aezxerr152");
-   		ResponseEntity<OpenWeatherResponse> responseEntity = restTemplate.getForEntity(currentWeatherurl,OpenWeatherResponse.class);
+   		ResponseEntity<OpenWeatherResponse> responseEntity = restTemplate.getForEntity(currentWeatherUrl,OpenWeatherResponse.class);
    		assertEquals(401, responseEntity.getStatusCodeValue());
 
    	}
@@ -57,13 +59,13 @@ class WeatherControllerTest {
     @Test
     void currentWeatherData() {
     	ReflectionTestUtils.setField(weatherService, "apiKey", "726441bd682ecf1be35712107a98cfd0");
-        ResponseEntity<OpenWeatherResponse> responseEntity = restTemplate.getForEntity(currentWeatherurl, OpenWeatherResponse.class);
+        ResponseEntity<OpenWeatherResponse> responseEntity = restTemplate.getForEntity(currentWeatherUrl, OpenWeatherResponse.class);
         assertEquals(200, responseEntity.getStatusCodeValue());
     }
     
     @Test
      void historyWeatherData() {
-        ResponseEntity<OpenWeatherResponse> responseEntity = restTemplate.getForEntity(historyWeatherurl, OpenWeatherResponse.class);
+        ResponseEntity<OpenWeatherResponse> responseEntity = restTemplate.getForEntity(historyWeatherUrl, OpenWeatherResponse.class);
         assertEquals(200, responseEntity.getStatusCodeValue());
     }
     @Test
@@ -78,5 +80,11 @@ class WeatherControllerTest {
     	ValidationException thrown = assertThrows(ValidationException.class,() -> weatherService.queryHistory("111"),"No City found");
     	assertEquals(thrown.getErrorCode(),HttpStatus.NOT_FOUND);
     }
+    
+    @Test
+    public void queryCurrentWeatherWithMultipleCity() {
+    	ResponseEntity<OpenWeatherResponse> responseEntity = restTemplate.getForEntity(locationWithCountryUrl, OpenWeatherResponse.class);
+        assertEquals(200, responseEntity.getStatusCodeValue());
+        }
 
 }

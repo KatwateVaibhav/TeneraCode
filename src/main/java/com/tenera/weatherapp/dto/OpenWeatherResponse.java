@@ -34,10 +34,5 @@ public class OpenWeatherResponse {
 	public void setWeather(List<WeatherCondition> weather) {
 		this.weather = weather;
 	}
-
-	@Override
-	public String toString() {
-		return "OpenWeatherResponse [main=" + main + ", weather=" + weather + "]";
-	}
 	
 }

@@ -1,28 +1,21 @@
 package com.tenera.weatherapp.exception;
 
+import org.springframework.http.HttpStatus;
+
 public class WeatherError {
-	private int errorCode;
+	private HttpStatus errorCode;
 	private String errorMessage;
-	public WeatherError(int errorCode, String errorMessage) {
+	public WeatherError(HttpStatus errorCode, String errorMessage) {
 		super();
 		this.errorCode = errorCode;
 		this.errorMessage = errorMessage;
 	}
-	public WeatherError() {
-		super();
-	}
-	public int getErrorCode() {
+	public HttpStatus getErrorCode() {
 		return errorCode;
-	}
-	public void setErrorCode(int errorCode) {
-		this.errorCode = errorCode;
 	}
 	public String getErrorMessage() {
 		return errorMessage;
 	}
-	public void setErrorMessage(String errorMessage) {
-		this.errorMessage = errorMessage;
-	}
-
+	
 }
 

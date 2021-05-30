@@ -3,6 +3,10 @@ package com.tenera.weatherapp.service;
 import com.tenera.weatherapp.dto.WeatherData;
 import com.tenera.weatherapp.dto.WeatherHistory;
 
+/**
+ * @author Vaibhav
+ *
+ */
 public interface WeatherService {
 	public WeatherData queryCurrentWeather(String location);
 

@@ -21,8 +21,4 @@ public class WeatherCondition {
 		this.main = main;
 	}
 
-	@Override
-	public String toString() {
-		return "WeatherCondition [main=" + main + "]";
-	}
 }
