@@ -35,8 +35,8 @@ curl --location --request GET 'localhost:8080/history?location=Berlin'
 * Exception handling is done, using a framework. @ExceptionHandler deals with  all the exceptions thrown from application.
 
 Handle Scenarios 
-`Blank Location
-`History not present
+`Blank Location,
+`History not present,
 `Invalid City,
 `Invalid API key
 
@@ -52,36 +52,36 @@ From this response, the required fields are used and the rest are ignored.
     "umbrella": false
 }
 `Weather History for Berlin
-       {
-    "avg_temp": 285.55,
-    "avg_pressure": 1026.0,
-    "history": [
-        {
-            "temp": 285.55,
-            "pressure": 1026.0,
-            "umbrella": false
-        },
-        {
-            "temp": 285.55,
-            "pressure": 1026.0,
-            "umbrella": false
-        },
-        {
-            "temp": 285.55,
-            "pressure": 1026.0,
-            "umbrella": false
-        },
-        {
-            "temp": 285.55,
-            "pressure": 1026.0,
-            "umbrella": false
-        },
-        {
-            "temp": 285.55,
-            "pressure": 1026.0,
-            "umbrella": false
-        }
-    ]
+      {
+   "avg_temp":285.55,
+   "avg_pressure":1026.0,
+   "history":[
+      {
+         "temp":285.55,
+         "pressure":1026.0,
+         "umbrella":false
+      },
+      {
+         "temp":285.55,
+         "pressure":1026.0,
+         "umbrella":false
+      },
+      {
+         "temp":285.55,
+         "pressure":1026.0,
+         "umbrella":false
+      },
+      {
+         "temp":285.55,
+         "pressure":1026.0,
+         "umbrella":false
+      },
+      {
+         "temp":285.55,
+         "pressure":1026.0,
+         "umbrella":false
+      }
+   ]
 }
 
 * The response before sending back to the client, is persisted in a H2 Database. 
@@ -94,10 +94,12 @@ Rest Template --> Controller --> Service layer --> Validation at service Layer -
 * The properties can be used to customise a information without changing the code. 
 
 `#OpenWeather Properties
+
 api.key = 726441bd682ecf1be35712107a98cfd0
 current.weather.url = http://api.openweathermap.org/data/2.5/weather
 
 `#DataSource Properties
+
 spring.datasource.url=jdbc:h2:mem:testdb
 spring.datasource.driverClassName=org.h2.Driver
 spring.datasource.username=sa
