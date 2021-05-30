@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import com.tenera.weatherapp.constants.ApplicationConstants;
 import com.tenera.weatherapp.dto.OpenWeatherResponse;
 import com.tenera.weatherapp.dto.WeatherCondition;
 import com.tenera.weatherapp.dto.WeatherData;
@@ -31,7 +32,7 @@ import com.tenera.weatherapp.service.WeatherService;
  *
  */
 @Service
-public class WeatherServiceImpl implements WeatherService {
+public class WeatherServiceImpl implements WeatherService,ApplicationConstants {
 
 	Logger logger = LoggerFactory.getLogger(WeatherServiceImpl.class);
 
@@ -48,27 +49,28 @@ public class WeatherServiceImpl implements WeatherService {
 	private WeatherRepository weatherRepository;
 
 	/**
-	 * Returns Current Weather for Given city but hitting the OpenWeatherMap API.
+	 * Calls the Open weather API and gets the weather information. Checks of the weather needs an
+     * Umbrella or not. Persists the result in the database. returns the response.
 	 */
 	public WeatherData queryCurrentWeather(String location) {
 
 		logger.debug("ENTRY : queryCurrentWeather {}", location);
 
 		if (!validateInput(location)) {
-			throw new ValidationException("No City found", HttpStatus.NOT_FOUND);
+			throw new ValidationException(CITY_NOT_FOUND, HttpStatus.NOT_FOUND);
 		}
 		WeatherData weatherData = null;
 		try {
 			// Format of URL is
 			// http://api.openweathermap.org/data/2.5/weather?q=Berlin&APPID=726441bd682ecf1be35712107a98cfd0
-			ResponseEntity<OpenWeatherResponse> response = restTemplate.getForEntity(url + "?q=" + location + "&appid=" + apiKey, OpenWeatherResponse.class);
+			ResponseEntity<OpenWeatherResponse> response = restTemplate.getForEntity(url + QUERY_PARAM_WEATHER_CITY + location + QUERY_PARAM_APP_ID + apiKey, OpenWeatherResponse.class);
 			double temp = Objects.requireNonNull(response.getBody()).getMain().getTemp();
 			double pressure = Objects.requireNonNull(response.getBody()).getMain().getPressure();
 
 			WeatherCondition weatherCondition = Objects.requireNonNull(response.getBody()).getWeather().stream()
-						.filter(w -> w.getMain().equals("Rain")
-							|| w.getMain().equals("Thunderstorm")
-							|| w.getMain().equals("Drizzle"))
+						.filter(w -> w.getMain().equals(RAIN)
+							|| w.getMain().equals(THUNDERSTORM)
+							|| w.getMain().equals(DRIZZLE))
 						.findAny().orElse(null);
 
 			boolean umbrella = weatherCondition != null;
@@ -98,8 +100,8 @@ public class WeatherServiceImpl implements WeatherService {
 		logger.debug("ENTRY : queryHistory {}", location);
 
 		if (!validateInput(location))
-			throw new ValidationException("No City found ", HttpStatus.NOT_FOUND);
-
+			throw new ValidationException(CITY_NOT_FOUND, HttpStatus.NOT_FOUND);
+		if (location != null && !location.isEmpty()) {
 		List<WeatherData> lastFiveQueries = new ArrayList<>(weatherRepository.findTop5ByLocationOrderByIdDesc(processLocation(location)));
 		if (lastFiveQueries.isEmpty()) {
 			return new WeatherHistory(0.0, 0.0, lastFiveQueries);
@@ -111,6 +113,9 @@ public class WeatherServiceImpl implements WeatherService {
 
 		// set all above values to WeatherHistory
 		return new WeatherHistory(avgTemp, avgPressure, lastFiveQueries);
+		}else {
+			throw new ValidationException(NO_GEOCODE, HttpStatus.NOT_FOUND);
+		}
 	}
 
 	/**
@@ -119,16 +124,15 @@ public class WeatherServiceImpl implements WeatherService {
 	public boolean validateInput(String location) {
 		// consider location only has letters
 		boolean allLetters = location.chars().allMatch(Character::isLetter);
-		if (allLetters)
-			return true;
-
-		// location consist of city and country
-		String[] loc = location.split(",");
-		if (loc.length != 2) {
-			return false;
-		} else {
-			return validateInput(loc[0]) && validateInput(loc[1]);
-		}
+			if (allLetters)
+				return true;
+			// location consist of city and country
+			String[] loc = location.split(",");
+			if (loc.length != 2) {
+				return false;
+			} else {
+				return validateInput(loc[0]) && validateInput(loc[1]);
+			}
 	}
 
 	/**
