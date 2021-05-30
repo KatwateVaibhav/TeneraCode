@@ -64,8 +64,4 @@ public class WeatherHistory {
 		this.history = history;
 	}
 
-	@Override
-	public String toString() {
-		return "WeatherHistory [avgTemp=" + avgTemp + ", avgPressure=" + avgPressure + ", history=" + history + "]";
-	}
 }

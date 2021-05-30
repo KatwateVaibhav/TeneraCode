@@ -10,7 +10,7 @@ public class WeatherControllerAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ValidationException.class)
     public final ResponseEntity<WeatherError> mapException(ValidationException ex) {
-        WeatherError error = new WeatherError(ex.getErrorCode(),ex.getMessage());
+        WeatherError error = new WeatherError(ex.getErrorCode(),ex.getErrorMsg());
         return new ResponseEntity<WeatherError>(error,  ex.getErrorCode());
     }
 }

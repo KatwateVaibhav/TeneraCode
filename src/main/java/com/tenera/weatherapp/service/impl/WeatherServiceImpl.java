@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,12 +76,14 @@ public class WeatherServiceImpl implements WeatherService {
 			// reduce duplications.
 			weatherData = new WeatherData(processLocation(location), temp, pressure, umbrella);
 			weatherRepository.save(weatherData);
-		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
-			if (e instanceof HttpClientErrorException.Unauthorized) {
-				throw new ValidationException(e.getMessage(),((HttpClientErrorException.Unauthorized) e).getStatusCode());
+		} catch (HttpClientErrorException  exception) {
+			logger.error(exception.getMessage(), exception);
+			String errorMsg = exception.getResponseBodyAsString();
+			JSONObject jsonObject = new JSONObject(errorMsg);
+			if (exception instanceof HttpClientErrorException.Unauthorized) {
+				throw new ValidationException(jsonObject.getString("message"),exception.getStatusCode());
 			} else {
-				throw new ValidationException(e.getMessage(), HttpStatus.NOT_FOUND);
+				throw new ValidationException(jsonObject.getString("message"), HttpStatus.NOT_FOUND);
 			}
 		}
 		return weatherData;
