@@ -55,6 +55,11 @@ class WeatherControllerTest {
 
    	}
 
+    @Test
+    void weatherHistoryNotAvailable() {
+       ResponseEntity<OpenWeatherResponse> responseEntity = restTemplate.getForEntity(historyWeatherUrl, OpenWeatherResponse.class);
+       assertEquals(HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE.value(), responseEntity.getStatusCodeValue());
+   }
     
     @Test
     void currentWeatherData() {
@@ -62,34 +67,38 @@ class WeatherControllerTest {
         ResponseEntity<OpenWeatherResponse> responseEntity = restTemplate.getForEntity(currentWeatherUrl, OpenWeatherResponse.class);
         assertEquals(HttpStatus.OK.value(), responseEntity.getStatusCodeValue());
     }
-    
+   
+   
     @Test
-     void historyWeatherData() {
-        ResponseEntity<OpenWeatherResponse> responseEntity = restTemplate.getForEntity(historyWeatherUrl, OpenWeatherResponse.class);
-        assertEquals(HttpStatus.OK.value(), responseEntity.getStatusCodeValue());
-    }
-    @Test
-    public void queryCurrentWeatherWithBadRequest() {
+     void queryCurrentWeatherWithBadRequest() {
     	ValidationException thrown = assertThrows(ValidationException.class,() -> weatherService.queryCurrentWeather("XYZ"),"No City found");
     	assertEquals(HttpStatus.NOT_FOUND,thrown.getErrorCode());
     }
-
+    
     @Test
-    public void queryHistoryWithBadRequest() {
+     void queryCurrentWeatherWithInvalidData() {
+        // WHEN AND THEN
+    	ValidationException thrown = assertThrows(ValidationException.class,() -> weatherService.queryCurrentWeather("111"),"No City found");
+    	assertEquals(HttpStatus.NOT_FOUND,thrown.getErrorCode());
+    }
+    
+    
+    @Test
+     void queryHistoryWithBadRequest() {
         // WHEN AND THEN
     	ValidationException thrown = assertThrows(ValidationException.class,() -> weatherService.queryHistory("111"),"No City found");
     	assertEquals(HttpStatus.NOT_FOUND,thrown.getErrorCode());
     }
     
     @Test
-    public void queryHistoryWithBlankValue() {
+    void queryHistoryWithBlankValue() {
         // WHEN AND THEN
     	ValidationException thrown = assertThrows(ValidationException.class,() -> weatherService.queryHistory(""),"Nothing to geocode");
     	assertEquals(HttpStatus.NOT_FOUND,thrown.getErrorCode());
     }
     
     @Test
-    public void queryCurrentWeatherWithMultipleCity() {
+    void queryCurrentWeatherWithMultipleCity() {
     	ResponseEntity<OpenWeatherResponse> responseEntity = restTemplate.getForEntity(locationWithCountryUrl, OpenWeatherResponse.class);
         assertEquals(HttpStatus.OK.value(), responseEntity.getStatusCodeValue());
         }

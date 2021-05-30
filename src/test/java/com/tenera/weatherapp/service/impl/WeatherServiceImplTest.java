@@ -39,7 +39,7 @@ class WeatherServiceImplTest {
 
     
     @Test
-    public void queryCurrentWeatherWithHappyCase() {
+    void queryCurrentWeatherWithHappyCase() {
         // GIVEN
         Main main = new Main(10.0, 20.0);
         WeatherCondition weatherCondition = new WeatherCondition();
@@ -56,27 +56,13 @@ class WeatherServiceImplTest {
         // THEN
         assertThat(weatherData.getTemp()).isEqualTo(10.0);
         assertThat(weatherData.getPressure()).isEqualTo(20.0);
-        assertThat(weatherData.isUmbrella()).isEqualTo(true);
+        assertThat(weatherData.isUmbrella()).isTrue();
     }
 
 
-   
+ 
     @Test
-    public void queryHistoryWithEmptyResponse() {
-        // GIVEN
-        when(weatherRepository.findTop5ByLocationOrderByIdDesc(anyString())).thenReturn(new ArrayList<>());
-        
-        // WHEN
-        WeatherHistory weatherHistory = weatherService.queryHistory("Berlin");
-
-        // THEN
-        assertThat(weatherHistory.getAvgTemp()).isEqualTo(0.0);
-        assertThat(weatherHistory.getAvgPressure()).isEqualTo(0.0);
-        assertThat(weatherHistory.getHistory().size()).isZero();
-    }
-
-    @Test
-    public void queryHistoryWithHappyCase() {
+    void queryHistoryWithHappyCase() {
         // GIVEN
         WeatherData weatherData1 = new WeatherData("Berlin" , 10.0, 20.0, true);
         WeatherData weatherData2 = new WeatherData();

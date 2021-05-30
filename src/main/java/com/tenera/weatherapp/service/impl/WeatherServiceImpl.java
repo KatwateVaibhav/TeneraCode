@@ -32,7 +32,7 @@ import com.tenera.weatherapp.service.WeatherService;
  *
  */
 @Service
-public class WeatherServiceImpl implements WeatherService,ApplicationConstants {
+public class WeatherServiceImpl implements WeatherService {
 
 	Logger logger = LoggerFactory.getLogger(WeatherServiceImpl.class);
 
@@ -57,20 +57,20 @@ public class WeatherServiceImpl implements WeatherService,ApplicationConstants {
 		logger.debug("ENTRY : queryCurrentWeather {}", location);
 
 		if (!validateInput(location)) {
-			throw new ValidationException(CITY_NOT_FOUND, HttpStatus.NOT_FOUND);
+			throw new ValidationException(ApplicationConstants.CITY_NOT_FOUND, HttpStatus.NOT_FOUND);
 		}
 		WeatherData weatherData = null;
 		try {
 			// Format of URL is
 			// http://api.openweathermap.org/data/2.5/weather?q=Berlin&APPID=726441bd682ecf1be35712107a98cfd0
-			ResponseEntity<OpenWeatherResponse> response = restTemplate.getForEntity(url + QUERY_PARAM_WEATHER_CITY + location + QUERY_PARAM_APP_ID + apiKey, OpenWeatherResponse.class);
+			ResponseEntity<OpenWeatherResponse> response = restTemplate.getForEntity(url + ApplicationConstants.QUERY_PARAM_WEATHER_CITY + location + ApplicationConstants.QUERY_PARAM_APP_ID + apiKey, OpenWeatherResponse.class);
 			double temp = Objects.requireNonNull(response.getBody()).getMain().getTemp();
 			double pressure = Objects.requireNonNull(response.getBody()).getMain().getPressure();
 
 			WeatherCondition weatherCondition = Objects.requireNonNull(response.getBody()).getWeather().stream()
-						.filter(w -> w.getMain().equals(RAIN)
-							|| w.getMain().equals(THUNDERSTORM)
-							|| w.getMain().equals(DRIZZLE))
+						.filter(w -> w.getMain().equals(ApplicationConstants.RAIN)
+							|| w.getMain().equals(ApplicationConstants.THUNDERSTORM)
+							|| w.getMain().equals(ApplicationConstants.DRIZZLE))
 						.findAny().orElse(null);
 
 			boolean umbrella = weatherCondition != null;
@@ -100,11 +100,11 @@ public class WeatherServiceImpl implements WeatherService,ApplicationConstants {
 		logger.debug("ENTRY : queryHistory {}", location);
 
 		if (!validateInput(location))
-			throw new ValidationException(CITY_NOT_FOUND, HttpStatus.NOT_FOUND);
+			throw new ValidationException(ApplicationConstants.CITY_NOT_FOUND, HttpStatus.NOT_FOUND);
 		if (location != null && !location.isEmpty()) {
 		List<WeatherData> lastFiveQueries = new ArrayList<>(weatherRepository.findTop5ByLocationOrderByIdDesc(processLocation(location)));
 		if (lastFiveQueries.isEmpty()) {
-			return new WeatherHistory(0.0, 0.0, lastFiveQueries);
+			throw new ValidationException(ApplicationConstants.NO_HISTORY, HttpStatus.REQUESTED_RANGE_NOT_SATISFIABLE);
 		}
 
 		// Calculate avg values
@@ -114,7 +114,7 @@ public class WeatherServiceImpl implements WeatherService,ApplicationConstants {
 		// set all above values to WeatherHistory
 		return new WeatherHistory(avgTemp, avgPressure, lastFiveQueries);
 		}else {
-			throw new ValidationException(NO_GEOCODE, HttpStatus.NOT_FOUND);
+			throw new ValidationException(ApplicationConstants.NO_GEOCODE, HttpStatus.NOT_FOUND);
 		}
 	}
 
